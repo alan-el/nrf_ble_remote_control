@@ -83,7 +83,7 @@
 
 #define SEC_PARAM_BOND              1                                   /**< Perform bonding. */
 #define SEC_PARAM_MITM              0                                   /**< Man In The Middle protection not required. */
-#define SEC_PARAM_LESC              1                                   /**< LE Secure Connections enabled. */
+#define SEC_PARAM_LESC              0                                   /**< LE Secure Connections enabled. */
 #define SEC_PARAM_KEYPRESS          0                                   /**< Keypress notifications not enabled. */
 #define SEC_PARAM_IO_CAPABILITIES   BLE_GAP_IO_CAPS_NONE                /**< No I/O capabilities. */
 #define SEC_PARAM_OOB               0                                   /**< Out Of Band data not available. */
@@ -98,15 +98,6 @@ static ble_uuid_t const m_rcs_uuid =
     .uuid = BLE_UUID_RCS_SERVICE,
     .type = RCS_SERVICE_UUID_TYPE
 };
-
-/**@brief Macro to unpack 16bit unsigned UUID from octet stream. */
-#define UUID16_EXTRACT(DST, SRC) \
-    do                           \
-    {                            \
-        (*(DST))   = (SRC)[1];   \
-        (*(DST)) <<= 8;          \
-        (*(DST))  |= (SRC)[0];   \
-    } while (0)
 
 BLE_RCS_C_DEF(m_ble_rcs_c);
 NRF_BLE_GQ_DEF(m_ble_gatt_queue,                                    /**< BLE GATT Queue instance. */
@@ -128,11 +119,11 @@ static ble_gap_scan_params_t const m_scan_param =
     .interval_us   = NRF_BLE_SCAN_SCAN_INTERVAL * UNIT_0_625_MS,
     .window_us     = NRF_BLE_SCAN_SCAN_WINDOW * UNIT_0_625_MS,
 #else
-    .interval      = NRF_BLE_SCAN_SCAN_INTERVAL,
-    .window        = NRF_BLE_SCAN_SCAN_WINDOW,
+    .interval      = NRF_BLE_SCAN_SCAN_INTERVAL,    // 100ms
+    .window        = NRF_BLE_SCAN_SCAN_WINDOW,      // 50ms
 #endif // (NRF_SD_BLE_API_VERSION > 7)
     .filter_policy = BLE_GAP_SCAN_FP_WHITELIST,
-    .timeout       = SCAN_DURATION_WITELIST,
+    .timeout       = SCAN_DURATION_WITELIST,        // 30s
     .scan_phys     = BLE_GAP_PHY_1MBPS,
 };
 
@@ -633,6 +624,7 @@ static void scan_evt_handler(scan_evt_t const * p_scan_evt)
         } break;
 
         case NRF_BLE_SCAN_EVT_FILTER_MATCH:
+            NRF_LOG_INFO("Scan filter match.");
             break;
         case NRF_BLE_SCAN_EVT_WHITELIST_ADV_REPORT:
             break;
