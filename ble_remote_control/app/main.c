@@ -539,6 +539,11 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
 
     switch (p_ble_evt->header.evt_id)
     {
+        case BLE_GATTS_EVT_WRITE:
+            uint8_t len = p_ble_evt->evt.gatts_evt.params.write.len;
+            NRF_LOG_DEBUG("len = %d",len);
+            NRF_LOG_DEBUG("PARAMS UUID:0x%x", p_ble_evt->evt.gatts_evt.params.write.uuid.uuid);
+            break;
         case BLE_GAP_EVT_CONNECTED:
             NRF_LOG_INFO("Connected");
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
@@ -616,6 +621,7 @@ static void ble_stack_init(void)
 
     // Register a handler for BLE events.
     NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, ble_evt_handler, NULL);
+    NRF_SDH_BLE_OBSERVER(m_our_service_observer, APP_BLE_OBSERVER_PRIO, ble_rc_service_on_ble_evt, (void*) &m_rcs);
 }
 
 
@@ -740,7 +746,7 @@ static void idle_state_handle(void)
  */
 int main(void)
 {
-    bool erase_bonds = false;
+    bool erase_bonds = true;
 
     // Initialize.
     log_init();
