@@ -50,6 +50,8 @@
 
 #define NRF_LOG_MODULE_NAME ble_rcs_c
 #include "nrf_log.h"
+#include "nrf_log_ctrl.h"
+#include "nrf_log_default_backends.h"
 NRF_LOG_MODULE_REGISTER();
 
 
@@ -286,4 +288,36 @@ uint32_t ble_rcs_c_handles_assign(ble_rcs_c_t               * p_ble_rcs,
     }
     return nrf_ble_gq_conn_handle_register(p_ble_rcs->p_gatt_queue, conn_handle);
 }
+
+void ble_rcs_command_notify_debug(ble_rcs_cmd_t *p_cmd)
+{
+    switch(*p_cmd)
+    {
+        case BLE_RCS_CMD_NEXT_PARA:
+            NRF_LOG_DEBUG("Receive next paragraph command.");
+            break;
+        case BLE_RCS_CMD_PHOTO:
+            NRF_LOG_DEBUG("Receive photograph command.");
+            break;
+        case BLE_RCS_CMD_PREV_PARA:
+            NRF_LOG_DEBUG("Receive previous paragraph command.");
+            break;
+        case BLE_RCS_CMD_PAUSE:
+            NRF_LOG_DEBUG("Receive pause command.");
+            break;
+        case BLE_RCS_CMD_MINUS:
+            NRF_LOG_DEBUG("Receive minus command.");
+            break;
+        case BLE_RCS_CMD_PLUS:
+            NRF_LOG_DEBUG("Receive plus command.");
+            break;
+        case BLE_RCS_CMD_MODE:
+            NRF_LOG_DEBUG("Receive mode command.");
+            break;
+        default:
+            NRF_LOG_DEBUG("Receive unknown command.");
+            break;
+    }
+}
+
 #endif // NRF_MODULE_ENABLED(BLE_RCS_C)

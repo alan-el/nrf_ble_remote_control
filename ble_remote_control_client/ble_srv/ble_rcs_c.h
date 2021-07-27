@@ -113,6 +113,20 @@ typedef enum
     BLE_RCS_C_EVT_DISCONNECTED          /**< Event indicating that the RCS server disconnected. */
 } ble_rcs_c_evt_type_t;
 
+typedef enum
+{
+    BLE_RCS_CMD_NEXT_PARA = 0,
+    BLE_RCS_CMD_PHOTO,
+    BLE_RCS_CMD_PREV_PARA,
+    BLE_RCS_CMD_PAUSE,
+    BLE_RCS_CMD_MINUS,
+    BLE_RCS_CMD_PLUS,
+    BLE_RCS_CMD_MODE,
+
+    BLE_RCS_CMD_INVALID = 0xFF,
+    
+}ble_rcs_cmd_t;
+
 /**@brief Handles on the connected peer device needed to interact with it. */
 typedef struct
 {
@@ -125,9 +139,7 @@ typedef struct
 {
     ble_rcs_c_evt_type_t evt_type;
     uint16_t             conn_handle;
-    //uint8_t            * p_data;
-    //uint16_t             data_len;
-    uint8_t* p_command;     // size = two bytes( 16 bits )
+    uint8_t*             p_command;   // size = 1 byte
     ble_rcs_c_handles_t  handles;     /**< Handles on which the Nordic UART service characteristics were discovered on the peer device. This is filled if the evt_type is @ref BLE_RCS_C_EVT_DISCOVERY_COMPLETE.*/
 } ble_rcs_c_evt_t;
 
@@ -160,6 +172,7 @@ typedef struct
     nrf_ble_gq_t            * p_gatt_queue;   /**< Pointer to BLE GATT Queue instance. */
 } ble_rcs_c_init_t;
 
+void ble_rcs_command_notify_debug(ble_rcs_cmd_t *p_cmd);
 
 /**@brief     Function for initializing the Remote Control client module.
  *
