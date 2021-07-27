@@ -1,6 +1,7 @@
 #include "button.h"
 #include "app_timer.h"
 #include "app_error.h"
+#include "ble_rcs.h"
 
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
@@ -116,34 +117,35 @@ void button_command_process(button_event_t btn_evt)
     {
         case BUTTON_EVENT_NEXT_PARA:
             NRF_LOG_DEBUG("Next paragraph command get.");
-            // TODO
+            ble_rcs_command_notification(BLE_RCS_CMD_NEXT_PARA);
             break;
         case BUTTON_EVENT_PHOTO:
             NRF_LOG_DEBUG("Photograph command get.");
-            // TODO
+            ble_rcs_command_notification(BLE_RCS_CMD_PHOTO);
             break;
         case BUTTON_EVENT_PREV_PARA:
             NRF_LOG_DEBUG("Previous paragraph command get.");
-            // TODO
+            ble_rcs_command_notification(BLE_RCS_CMD_PREV_PARA);
             break;
         case BUTTON_EVENT_PAUSE:
             NRF_LOG_DEBUG("Pause command get.");
-            // TODO
+            ble_rcs_command_notification(BLE_RCS_CMD_PAUSE);
             break;
         case BUTTON_EVENT_MINUS:
             NRF_LOG_DEBUG("Minus command get.");
-            // TODO
+            ble_rcs_command_notification(BLE_RCS_CMD_MINUS);
             break;
         case BUTTON_EVENT_PLUS:
             NRF_LOG_DEBUG("Plus command get.");
-            // TODO
+            ble_rcs_command_notification(BLE_RCS_CMD_PLUS);
             break;
         case BUTTON_EVENT_MODE:
             NRF_LOG_DEBUG("Mode command get.");
-            // TODO
+            ble_rcs_command_notification(BLE_RCS_CMD_MODE);
             break;   
         case BUTTON_EVENT_DEBUG:
             NRF_LOG_DEBUG("Debug command get.");
+            ble_rcs_command_notification(BLE_RCS_CMD_INVALID);
             break;
         default:
             break;
