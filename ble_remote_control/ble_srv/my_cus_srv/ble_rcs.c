@@ -41,7 +41,7 @@
 #include "ble_rcs.h"
 #include "app_error.h"
 #include "SEGGER_RTT.h"
-
+extern ble_rcs_t m_rcs;
 // ALREADY_DONE_FOR_YOU: Declaration of a function that will take care of some housekeeping of ble connections related to our service and characteristic
 void ble_rc_service_on_ble_evt(ble_evt_t const * p_ble_evt, void * p_context)
 {
@@ -119,10 +119,10 @@ static uint32_t remote_control_service_char_add(ble_rcs_t * p_rc_service)
         // OUR_JOB: Step 2.H, Set characteristic length in number of bytes
         if(i == 0)	// 命令																								
         {	
-            attr_char_value.max_len     = 2;
-            attr_char_value.init_len    = 2;
-            uint8_t value[2] = {0, 0};
-            attr_char_value.p_value = (uint8_t *)value;
+            attr_char_value.max_len     = 1;
+            attr_char_value.init_len    = 1;
+            uint8_t value = BLE_RCS_CMD_INVALID;
+            attr_char_value.p_value = (uint8_t *)&value;
         }
         //选择特征值句柄
         ble_gatts_char_handles_t* p_char_handle;
@@ -175,3 +175,34 @@ void remote_control_service_init(ble_rcs_t * p_rc_service)
     remote_control_service_char_add(p_rc_service);
 }
 
+void ble_rcs_command_notification(ble_rcs_cmd_t cmd)
+{
+    uint32_t err_code;
+    
+    // 更新特征值
+    ble_gatts_value_t gatts_value;
+    gatts_value.len = 1;
+    gatts_value.offset = 0;
+    gatts_value.p_value = (uint8_t*)&cmd;
+    err_code = sd_ble_gatts_value_set(BLE_CONN_HANDLE_INVALID, m_rcs.command_char_handles.value_handle, &gatts_value);
+    APP_ERROR_CHECK(err_code);
+    
+    // OUR_JOB: Step 3.E, Update characteristic value
+    if (m_rcs.conn_handle != BLE_CONN_HANDLE_INVALID )
+    {
+        uint16_t len;
+        ble_gatts_hvx_params_t hvx_params;
+        memset(&hvx_params, 0, sizeof(hvx_params));
+        
+        hvx_params.handle = m_rcs.command_char_handles.value_handle;
+        hvx_params.type   = BLE_GATT_HVX_NOTIFICATION;
+        hvx_params.offset = 0;
+        len = sizeof(uint8_t);
+        hvx_params.p_len  = &len;
+        hvx_params.p_data = (uint8_t*)&cmd;
+  
+        err_code = sd_ble_gatts_hvx(m_rcs.conn_handle, &hvx_params); 
+        APP_ERROR_CHECK(err_code);
+
+    } 
+}

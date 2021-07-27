@@ -62,6 +62,20 @@
 
 #define BLE_CHARACTERISTICS_COMMAND_UUID            0x0001  
 
+typedef enum
+{
+    BLE_RCS_CMD_NEXT_PARA = 0,
+    BLE_RCS_CMD_PHOTO,
+    BLE_RCS_CMD_PREV_PARA,
+    BLE_RCS_CMD_PAUSE,
+    BLE_RCS_CMD_MINUS,
+    BLE_RCS_CMD_PLUS,
+    BLE_RCS_CMD_MODE,
+
+    BLE_RCS_CMD_INVALID = 0xFF,
+    
+}ble_rcs_cmd_t;
+
 typedef struct
 {
     uint16_t conn_handle;      
@@ -86,6 +100,9 @@ void ble_rc_service_on_ble_evt(ble_evt_t const * p_ble_evt, void * p_context);
  * @param[in]   p_our_service       Pointer to Our Service structure.
  */
 void remote_control_service_init(ble_rcs_t * p_rc_service);
+
+void ble_rcs_command_notification(ble_rcs_cmd_t cmd);
+
 
 #endif
 
