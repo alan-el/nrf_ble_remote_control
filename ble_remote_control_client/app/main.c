@@ -733,15 +733,35 @@ void scanning_start(bool * p_erase_bonds)
         scan_start();
     }
 }
+
+APP_TIMER_DEF(m_notify_timer);
+
+void command_char_notify_enable(void *p_context)
+{
+    ble_rcs_c_t *p_ble_rcs_c  = (ble_rcs_c_t *)p_context;
+    uint32_t err_code;
+    err_code = ble_rcs_c_cmd_notif_enable(p_ble_rcs_c);
+    APP_ERROR_CHECK(err_code);
+    
+}
+
+uint32_t command_char_notify_timer_create(void)
+{
+    uint32_t ret_code;
+    ret_code = app_timer_create(&m_notify_timer, APP_TIMER_MODE_SINGLE_SHOT, command_char_notify_enable);
+    return ret_code;
+}
+
+
 /**@brief Callback handling Nordic UART Service (NUS) client events.
  *
- * @details This function is called to notify the application of NUS client events.
+ * @details This function is called to notify the application of RCS client events.
  *
- * @param[in]   p_ble_nus_c   NUS client handle. This identifies the NUS client.
- * @param[in]   p_ble_nus_evt Pointer to the NUS client event.
+ * @param[in]   p_ble_rcs_c   RCS client handle. This identifies the RCS client.
+ * @param[in]   p_ble_rcs_evt Pointer to the NUS client event.
  */
 
-/**@snippet [Handling events from the ble_nus_c module] */
+/**@snippet [Handling events from the ble_rcs_c module] */
 static void ble_rcs_c_evt_handler(ble_rcs_c_t * p_ble_rcs_c, ble_rcs_c_evt_t const * p_ble_rcs_evt)
 {
     ret_code_t err_code;
@@ -759,14 +779,14 @@ static void ble_rcs_c_evt_handler(ble_rcs_c_t * p_ble_rcs_c, ble_rcs_c_evt_t con
             {
                 APP_ERROR_CHECK(err_code);
             }
+            err_code = app_timer_start(m_notify_timer, APP_TIMER_TICKS(1000), (void*)p_ble_rcs_c);
+            APP_ERROR_CHECK(err_code);       
             
-            err_code = ble_rcs_c_cmd_notif_enable(p_ble_rcs_c);
-            APP_ERROR_CHECK(err_code);
             NRF_LOG_INFO("Connected to device with Remote Control Service.");
             break;
 
         case BLE_RCS_C_EVT_RCS_COMMAND_EVT:
-            // TODO Receive a command, need handle
+            ble_rcs_command_notify_debug((ble_rcs_cmd_t *)p_ble_rcs_evt->p_command);
             break;
 
         case BLE_RCS_C_EVT_DISCONNECTED:
@@ -800,7 +820,7 @@ static void rcs_c_init(void)
 
 int main(void)
 {
-    bool erase_bonds;
+    bool erase_bonds = true;
 
     // Initialize.
     log_init();
@@ -812,7 +832,7 @@ int main(void)
     db_discovery_init();
     rcs_c_init();
     scan_init();
-
+    command_char_notify_timer_create();
     // Start execution.
     NRF_LOG_INFO("Heart Rate collector example started.");
     scanning_start(&erase_bonds);
