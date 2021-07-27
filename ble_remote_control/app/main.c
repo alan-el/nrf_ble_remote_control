@@ -85,6 +85,7 @@
 #include "nrf_log_default_backends.h"
 
 #include "ble_rcs.h"
+#include "button.h"
 
 
 #define DEVICE_NAME                         "BLE_RC"                       /**< Name of device. Will be included in the advertising data. */
@@ -739,7 +740,7 @@ static void idle_state_handle(void)
  */
 int main(void)
 {
-    bool erase_bonds = true;
+    bool erase_bonds = false;
 
     // Initialize.
     log_init();
@@ -753,6 +754,7 @@ int main(void)
     advertising_init();
     conn_params_init();
     peer_manager_init();
+    button_init();
 
     // Start execution.
     NRF_LOG_INFO("ble remote control started.");
