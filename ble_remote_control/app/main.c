@@ -86,7 +86,7 @@
 
 #include "ble_rcs.h"
 #include "button.h"
-
+#include "battery.h"
 
 #define DEVICE_NAME                         "BLE_RC"                       /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME                   "NordicSemiconductor"                      /**< Manufacturer. Will be passed to Device Information Service. */
@@ -536,11 +536,11 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
 static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
 {
     ret_code_t err_code;
-
+    uint8_t len;
     switch (p_ble_evt->header.evt_id)
     {
         case BLE_GATTS_EVT_WRITE:
-            uint8_t len = p_ble_evt->evt.gatts_evt.params.write.len;
+            len = p_ble_evt->evt.gatts_evt.params.write.len;
             NRF_LOG_DEBUG("len = %d",len);
             NRF_LOG_DEBUG("PARAMS UUID:0x%x", p_ble_evt->evt.gatts_evt.params.write.uuid.uuid);
             break;
@@ -760,12 +760,19 @@ int main(void)
     advertising_init();
     conn_params_init();
     peer_manager_init();
+    
     button_init();
-
+    sd_power_dcdc_mode_set(NRF_POWER_DCDC_ENABLE);
+#ifdef VOLTAGE_NEED_NOTIFY
+    battery_vol_detect_timer_create();
+    battery_vol_detect_timer_start();
+#else
+    battery_voltage_sample(NULL);
+#endif
     // Start execution.
     NRF_LOG_INFO("ble remote control started.");
     advertising_start(erase_bonds);
-
+    
     // Enter main loop.
     for (;;)
     {
