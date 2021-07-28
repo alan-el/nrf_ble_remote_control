@@ -10,3 +10,7 @@ Using nRF52 series SoC to develop a BLE remote control by a custom GATT service 
 
 2021-07-27 晚
 1. 调好按键和使能notification, 而且只有完成绑定的peer才能写CCCD
+
+2021-07-28 下午
+1. Server 增加电量检测
+2. Client 增加UART
