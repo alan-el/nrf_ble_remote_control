@@ -338,7 +338,7 @@
               <MiscControls>--reduce_paths</MiscControls>
               <Define>DEBUG APP_TIMER_V2 APP_TIMER_V2_RTC1_ENABLED BLE_STACK_SUPPORT_REQD BOARD_PCA10040 CONFIG_GPIO_AS_PINRESET FLOAT_ABI_HARD MBEDTLS_CONFIG_FILE=&lt;nrf_crypto_mbedtls_config.h&gt; NRF52 NRF52832_XXAA NRF52_PAN_74 NRF_CRYPTO_MAX_INSTANCE_COUNT=1 NRF_SD_BLE_API_VERSION=7 S132 SOFTDEVICE_PRESENT __HEAP_SIZE=8192 __STACK_SIZE=8192</Define>
               <Undefine></Undefine>
-              <IncludePath>..\app;..\ble_srv;..\bsp;..\config;..\nrf_ble\ble_db_discovery;..\nrf_ble\common;..\nrf_ble\nrf_ble_gatt;..\nrf_ble\nrf_ble_gq;..\nrf_ble\nrf_ble_scan;..\nrf_ble\peer_manager;..\nrf_drv;..\nrf_drv\legacy;..\nrf_drv\nrfx;..\nrf_drv\nrfx\drivers\include;..\nrf_drv\nrfx\hal;..\nrf_drv\nrfx\soc;..\nrf_lib\atomic;..\nrf_lib\atomic_fifo;..\nrf_lib\atomic_flags;..\nrf_lib\balloc;..\nrf_lib\button;..\nrf_lib\delay;..\nrf_lib\experimental_section_vars;..\nrf_lib\fds;..\nrf_lib\fprintf;..\nrf_lib\fstorage;..\nrf_lib\hardfault;..\nrf_lib\mem_manager;..\nrf_lib\memobj;..\nrf_lib\mutex;..\nrf_lib\pwr_mgmt;..\nrf_lib\queue;..\nrf_lib\ringbuf;..\nrf_lib\scheduler;..\nrf_lib\sortlist;..\nrf_lib\strerror;..\nrf_lib\timer;..\nrf_lib\util;..\nrf_log;..\nrf_log\src;..\nrf_sfd\common;..\nrf_sfd\s132\headers;..\nrf_sfd\s132\headers\nrf52;..\segger_rtt</IncludePath>
+              <IncludePath>..\app;..\ble_srv;..\bsp;..\config;..\nrf_ble\ble_db_discovery;..\nrf_ble\common;..\nrf_ble\nrf_ble_gatt;..\nrf_ble\nrf_ble_gq;..\nrf_ble\nrf_ble_scan;..\nrf_ble\peer_manager;..\nrf_drv;..\nrf_drv\legacy;..\nrf_drv\nrfx;..\nrf_drv\nrfx\drivers\include;..\nrf_drv\nrfx\hal;..\nrf_drv\nrfx\soc;..\nrf_lib\atomic;..\nrf_lib\atomic_fifo;..\nrf_lib\atomic_flags;..\nrf_lib\balloc;..\nrf_lib\button;..\nrf_lib\delay;..\nrf_lib\experimental_section_vars;..\nrf_lib\fds;..\nrf_lib\fifo;..\nrf_lib\fprintf;..\nrf_lib\fstorage;..\nrf_lib\hardfault;..\nrf_lib\mem_manager;..\nrf_lib\memobj;..\nrf_lib\mutex;..\nrf_lib\pwr_mgmt;..\nrf_lib\queue;..\nrf_lib\ringbuf;..\nrf_lib\scheduler;..\nrf_lib\sortlist;..\nrf_lib\strerror;..\nrf_lib\timer;..\nrf_lib\uart;..\nrf_lib\util;..\nrf_log;..\nrf_log\src;..\nrf_sfd\common;..\nrf_sfd\s132\headers;..\nrf_sfd\s132\headers\nrf52;..\segger_rtt</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -396,6 +396,13 @@
         </Group>
         <Group>
           <GroupName>bsp</GroupName>
+          <Files>
+            <File>
+              <FileName>uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bsp\uart.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>nrf_ble</GroupName>
@@ -511,6 +518,11 @@
               <FilePath>..\nrf_drv\legacy\nrf_drv_clock.c</FilePath>
             </File>
             <File>
+              <FileName>nrf_drv_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\nrf_drv\legacy\nrf_drv_uart.c</FilePath>
+            </File>
+            <File>
               <FileName>nrfx_atomic.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\nrf_drv\nrfx\soc\nrfx_atomic.c</FilePath>
@@ -529,6 +541,16 @@
               <FileName>nrfx_prs.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\nrf_drv\nrfx\drivers\src\prs\nrfx_prs.c</FilePath>
+            </File>
+            <File>
+              <FileName>nrfx_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\nrf_drv\nrfx\drivers\src\nrfx_uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>nrfx_uarte.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\nrf_drv\nrfx\drivers\src\nrfx_uarte.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -556,6 +578,11 @@
               <FilePath>..\nrf_lib\util\app_error_weak.c</FilePath>
             </File>
             <File>
+              <FileName>app_fifo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\nrf_lib\fifo\app_fifo.c</FilePath>
+            </File>
+            <File>
               <FileName>app_scheduler.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\nrf_lib\scheduler\app_scheduler.c</FilePath>
@@ -564,6 +591,11 @@
               <FileName>app_timer2.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\nrf_lib\timer\app_timer2.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_uart_fifo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\nrf_lib\uart\app_uart_fifo.c</FilePath>
             </File>
             <File>
               <FileName>app_util_platform.c</FileName>
@@ -1139,6 +1171,13 @@
         </Group>
         <Group>
           <GroupName>bsp</GroupName>
+          <Files>
+            <File>
+              <FileName>uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bsp\uart.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>nrf_ble</GroupName>
@@ -1254,6 +1293,11 @@
               <FilePath>..\nrf_drv\legacy\nrf_drv_clock.c</FilePath>
             </File>
             <File>
+              <FileName>nrf_drv_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\nrf_drv\legacy\nrf_drv_uart.c</FilePath>
+            </File>
+            <File>
               <FileName>nrfx_atomic.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\nrf_drv\nrfx\soc\nrfx_atomic.c</FilePath>
@@ -1272,6 +1316,16 @@
               <FileName>nrfx_prs.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\nrf_drv\nrfx\drivers\src\prs\nrfx_prs.c</FilePath>
+            </File>
+            <File>
+              <FileName>nrfx_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\nrf_drv\nrfx\drivers\src\nrfx_uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>nrfx_uarte.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\nrf_drv\nrfx\drivers\src\nrfx_uarte.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1299,6 +1353,11 @@
               <FilePath>..\nrf_lib\util\app_error_weak.c</FilePath>
             </File>
             <File>
+              <FileName>app_fifo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\nrf_lib\fifo\app_fifo.c</FilePath>
+            </File>
+            <File>
               <FileName>app_scheduler.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\nrf_lib\scheduler\app_scheduler.c</FilePath>
@@ -1307,6 +1366,11 @@
               <FileName>app_timer2.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\nrf_lib\timer\app_timer2.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_uart_fifo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\nrf_lib\uart\app_uart_fifo.c</FilePath>
             </File>
             <File>
               <FileName>app_util_platform.c</FileName>
