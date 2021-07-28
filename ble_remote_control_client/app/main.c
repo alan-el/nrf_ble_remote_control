@@ -73,6 +73,7 @@
 #include "nrf_ble_scan.h"
 
 #include "ble_rcs_c.h"
+#include "uart.h"
 
 #define APP_BLE_CONN_CFG_TAG        1                                   /**< A tag identifying the SoftDevice BLE configuration. */
 
@@ -833,6 +834,9 @@ int main(void)
     rcs_c_init();
     scan_init();
     command_char_notify_timer_create();
+    
+    uart_init();
+    sd_power_dcdc_mode_set(NRF_POWER_DCDC_ENABLE);
     // Start execution.
     NRF_LOG_INFO("Heart Rate collector example started.");
     scanning_start(&erase_bonds);
