@@ -102,8 +102,8 @@
 #define APP_ADV_FAST_INTERVAL               0x0028                                     /**< Fast advertising interval (in units of 0.625 ms. This value corresponds to 25 ms.). */
 #define APP_ADV_SLOW_INTERVAL               0x0C80                                     /**< Slow advertising interval (in units of 0.625 ms. This value corrsponds to 2 seconds). */
 
-#define APP_ADV_FAST_DURATION               3000                                       /**< The advertising duration of fast advertising in units of 10 milliseconds. */
-#define APP_ADV_SLOW_DURATION               18000                                      /**< The advertising duration of slow advertising in units of 10 milliseconds. */
+#define APP_ADV_FAST_DURATION               300//3000                                       /**< The advertising duration of fast advertising in units of 10 milliseconds. */
+#define APP_ADV_SLOW_DURATION               300//18000                                      /**< The advertising duration of slow advertising in units of 10 milliseconds. */
 
 
 /*lint -emacro(524, MIN_CONN_INTERVAL) // Loss of precision */
@@ -143,6 +143,7 @@ NRF_BLE_GATT_DEF(m_gatt);                                           /**< GATT mo
 NRF_BLE_QWR_DEF(m_qwr);                                             /**< Context for the Queued Write module.*/
 BLE_ADVERTISING_DEF(m_advertising);                                 /**< Advertising module instance. */
 
+extern button_event_t start_up_evt;
 ble_rcs_t m_rcs = {0};
 
 static uint16_t          m_conn_handle  = BLE_CONN_HANDLE_INVALID;  /**< Handle of the current connection. */
@@ -184,7 +185,13 @@ static void whitelist_set(pm_peer_id_list_skip_t skip)
     NRF_LOG_INFO("\tm_whitelist_peer_cnt %d, MAX_PEERS_WLIST %d",
                    peer_id_count + 1,
                    BLE_GAP_WHITELIST_ADDR_MAX_COUNT);
-
+    // zqn               
+    if(peer_id_count == 0 && start_up_evt != BUTTON_EVENT_NOTHING)
+    {
+        NRF_LOG_DEBUG("Start up event: %d cleared.", start_up_evt);
+        start_up_evt = BUTTON_EVENT_NOTHING;
+    }
+        
     err_code = pm_whitelist_set(peer_ids, peer_id_count);
     APP_ERROR_CHECK(err_code);
 }
@@ -206,27 +213,28 @@ static void identities_set(pm_peer_id_list_skip_t skip)
     APP_ERROR_CHECK(err_code);
 }
 
-
+static bool delete_bonds_after_disconnect = false;
 /**@brief Clear bond information from persistent storage.
  */
 void delete_bonds(void)
 {
-    if(m_conn_handle == BLE_CONN_HANDLE_INVALID)
+    ret_code_t err_code;
+    if(m_conn_handle != BLE_CONN_HANDLE_INVALID)
     {
-        ret_code_t err_code;
-        if(m_advertising.adv_mode_current != BLE_ADV_MODE_IDLE)
-        {
-            err_code = sd_ble_gap_adv_stop(m_advertising.adv_handle);
-            APP_ERROR_CHECK(err_code);
-        }
+        err_code = sd_ble_gap_disconnect(m_conn_handle,
+                               BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+        APP_ERROR_CHECK(err_code);
+        delete_bonds_after_disconnect = true;
+    } 
+    else if(m_advertising.adv_mode_current != BLE_ADV_MODE_IDLE)
+    {
+        err_code = sd_ble_gap_adv_stop(m_advertising.adv_handle);
+        APP_ERROR_CHECK(err_code);
+        
         NRF_LOG_INFO("Erase bonds!");
 
         err_code = pm_peers_delete();
         APP_ERROR_CHECK(err_code);
-    } 
-    else
-    {
-        NRF_LOG_INFO("Erase bonds failed for connection state!");
     }
 }
 
@@ -255,6 +263,8 @@ static void pm_evt_handler(pm_evt_t const * p_evt)
     {
         case PM_EVT_CONN_SEC_SUCCEEDED:
             m_peer_id = p_evt->peer_id;
+            if(start_up_evt != BUTTON_EVENT_NOTHING)
+                start_up_command_notification_timer_start(&start_up_evt);
             break;
 
         case PM_EVT_PEERS_DELETE_SUCCEEDED:
@@ -559,9 +569,12 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
 
         case BLE_GAP_EVT_DISCONNECTED:
             NRF_LOG_INFO("Disconnected");
-
+            
             m_conn_handle = BLE_CONN_HANDLE_INVALID;
-
+            if(delete_bonds_after_disconnect == true)
+            {
+                delete_bonds();   
+            }
             // disabling alert 3. signal - used for capslock ON
 
             break; // BLE_GAP_EVT_DISCONNECTED
@@ -764,6 +777,9 @@ int main(void)
     // Initialize.
     log_init();
     timers_init();
+
+    button_init();
+    
     power_management_init();
     ble_stack_init();
     scheduler_init();
@@ -774,7 +790,6 @@ int main(void)
     conn_params_init();
     peer_manager_init();
     
-    button_init();
     sd_power_dcdc_mode_set(NRF_POWER_DCDC_ENABLE);
 #ifdef VOLTAGE_NEED_NOTIFY
     battery_vol_detect_timer_create();
