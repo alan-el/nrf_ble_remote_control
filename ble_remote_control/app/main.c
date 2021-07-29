@@ -150,6 +150,8 @@ static pm_peer_id_t      m_peer_id;                                 /**< Device 
 
 static ble_uuid_t m_adv_uuids[] = {{BLE_REMOTE_CONTROL_SERVICE_UUID, BLE_UUID_TYPE_VENDOR_BEGIN}};
 
+void enter_power_down_mode(void);
+
 /**@brief Callback function for asserts in the SoftDevice.
  *
  * @details This function will be called in case of an assert in the SoftDevice.
@@ -207,33 +209,36 @@ static void identities_set(pm_peer_id_list_skip_t skip)
 
 /**@brief Clear bond information from persistent storage.
  */
-static void delete_bonds(void)
+void delete_bonds(void)
 {
-    ret_code_t err_code;
+    if(m_conn_handle == BLE_CONN_HANDLE_INVALID)
+    {
+        ret_code_t err_code;
+        if(m_advertising.adv_mode_current != BLE_ADV_MODE_IDLE)
+        {
+            err_code = sd_ble_gap_adv_stop(m_advertising.adv_handle);
+            APP_ERROR_CHECK(err_code);
+        }
+        NRF_LOG_INFO("Erase bonds!");
 
-    NRF_LOG_INFO("Erase bonds!");
-
-    err_code = pm_peers_delete();
-    APP_ERROR_CHECK(err_code);
+        err_code = pm_peers_delete();
+        APP_ERROR_CHECK(err_code);
+    } 
+    else
+    {
+        NRF_LOG_INFO("Erase bonds failed for connection state!");
+    }
 }
 
 
 /**@brief Function for starting advertising.
  */
-static void advertising_start(bool erase_bonds)
+static void advertising_start(void)
 {
-    if (erase_bonds == true)
-    {
-        delete_bonds();
-        // Advertising is started by PM_EVT_PEERS_DELETE_SUCCEEDED event.
-    }
-    else
-    {
-        whitelist_set(PM_PEER_ID_LIST_SKIP_NO_ID_ADDR);
+    whitelist_set(PM_PEER_ID_LIST_SKIP_NO_ID_ADDR);
 
-        ret_code_t ret = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
-        APP_ERROR_CHECK(ret);
-    }
+    ret_code_t ret = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
+    APP_ERROR_CHECK(ret);
 }
 
 
@@ -253,7 +258,7 @@ static void pm_evt_handler(pm_evt_t const * p_evt)
             break;
 
         case PM_EVT_PEERS_DELETE_SUCCEEDED:
-            advertising_start(false);
+            advertising_start();
             break;
 
         case PM_EVT_PEER_DATA_UPDATE_SUCCEEDED:
@@ -473,6 +478,7 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
             break;
 
         case BLE_ADV_EVT_IDLE:
+            enter_power_down_mode();
             break;
 
         case BLE_ADV_EVT_WHITELIST_REQUEST:
@@ -717,6 +723,15 @@ static void log_init(void)
     NRF_LOG_DEFAULT_BACKENDS_INIT();
 }
 
+void enter_power_down_mode(void)
+{
+    NRF_LOG_DEBUG("Enter power down mode.");
+    
+    // Prepare wakeup buttons.
+    prepare_button_wake_up_from_power_down_mode();
+    // Go to system-off mode (this function will not return; wakeup will cause a reset).
+    sd_power_system_off();
+}
 
 /**@brief Function for initializing power management.
  */
@@ -746,8 +761,6 @@ static void idle_state_handle(void)
  */
 int main(void)
 {
-    bool erase_bonds = true;
-
     // Initialize.
     log_init();
     timers_init();
@@ -771,7 +784,7 @@ int main(void)
 #endif
     // Start execution.
     NRF_LOG_INFO("ble remote control started.");
-    advertising_start(erase_bonds);
+    advertising_start();
     
     // Enter main loop.
     for (;;)
