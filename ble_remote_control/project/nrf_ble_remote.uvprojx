@@ -396,6 +396,18 @@
         </Group>
         <Group>
           <GroupName>bsp</GroupName>
+          <Files>
+            <File>
+              <FileName>battery.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bsp\battery.c</FilePath>
+            </File>
+            <File>
+              <FileName>button.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bsp\button.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>nrf_ble</GroupName>
@@ -702,6 +714,11 @@
               <FileName>nrfx_prs.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\nrf_drv\nrfx\drivers\src\prs\nrfx_prs.c</FilePath>
+            </File>
+            <File>
+              <FileName>nrfx_saadc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\nrf_drv\nrfx\drivers\src\nrfx_saadc.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1604,6 +1621,18 @@
               </Aads>
             </GroupArmAds>
           </GroupOption>
+          <Files>
+            <File>
+              <FileName>battery.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bsp\battery.c</FilePath>
+            </File>
+            <File>
+              <FileName>button.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bsp\button.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>nrf_ble</GroupName>
@@ -2984,6 +3013,11 @@
               <FileName>nrfx_prs.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\nrf_drv\nrfx\drivers\src\prs\nrfx_prs.c</FilePath>
+            </File>
+            <File>
+              <FileName>nrfx_saadc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\nrf_drv\nrfx\drivers\src\nrfx_saadc.c</FilePath>
             </File>
           </Files>
         </Group>
