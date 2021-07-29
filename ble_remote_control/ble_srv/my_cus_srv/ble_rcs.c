@@ -40,7 +40,7 @@
 
 #include "ble_rcs.h"
 #include "app_error.h"
-#include "SEGGER_RTT.h"
+#include "nrf_log.h"
 extern ble_rcs_t m_rcs;
 // ALREADY_DONE_FOR_YOU: Declaration of a function that will take care of some housekeeping of ble connections related to our service and characteristic
 void ble_rc_service_on_ble_evt(ble_evt_t const * p_ble_evt, void * p_context)
@@ -186,23 +186,37 @@ void ble_rcs_command_notification(ble_rcs_cmd_t cmd)
     gatts_value.p_value = (uint8_t*)&cmd;
     err_code = sd_ble_gatts_value_set(BLE_CONN_HANDLE_INVALID, m_rcs.command_char_handles.value_handle, &gatts_value);
     APP_ERROR_CHECK(err_code);
+
     
-    // OUR_JOB: Step 3.E, Update characteristic value
+    
+    // 检查当前是否有连接
     if (m_rcs.conn_handle != BLE_CONN_HANDLE_INVALID )
     {
-        uint16_t len;
-        ble_gatts_hvx_params_t hvx_params;
-        memset(&hvx_params, 0, sizeof(hvx_params));
+        // 检查当前连接的Client是否使能了命令特征值的Notification or indication
+        uint16_t cccd_value;
+        // Pupulate ble_gatts_value_t structure to hold received data and metadata.
+        ble_gatts_value_t cccd_data;
+        cccd_data.len = BLE_CCCD_VALUE_LEN;
+        cccd_data.offset = 0;
+        cccd_data.p_value = (uint8_t*)&cccd_value;
+        sd_ble_gatts_value_get(m_rcs.conn_handle, m_rcs.command_char_handles.cccd_handle, &cccd_data);
+        NRF_LOG_DEBUG("CCCD value: %d", cccd_value);
         
-        hvx_params.handle = m_rcs.command_char_handles.value_handle;
-        hvx_params.type   = BLE_GATT_HVX_NOTIFICATION;
-        hvx_params.offset = 0;
-        len = sizeof(uint8_t);
-        hvx_params.p_len  = &len;
-        hvx_params.p_data = (uint8_t*)&cmd;
-  
-        err_code = sd_ble_gatts_hvx(m_rcs.conn_handle, &hvx_params); 
-        APP_ERROR_CHECK(err_code);
-
+        if(cccd_value == 1 || cccd_value == 2)
+        {
+            uint16_t len;
+            ble_gatts_hvx_params_t hvx_params;
+            memset(&hvx_params, 0, sizeof(hvx_params));
+            
+            hvx_params.handle = m_rcs.command_char_handles.value_handle;
+            hvx_params.type   = BLE_GATT_HVX_NOTIFICATION;
+            hvx_params.offset = 0;
+            len = sizeof(uint8_t);
+            hvx_params.p_len  = &len;
+            hvx_params.p_data = (uint8_t*)&cmd;
+      
+            err_code = sd_ble_gatts_hvx(m_rcs.conn_handle, &hvx_params); 
+            APP_ERROR_CHECK(err_code);
+        }
     } 
 }
