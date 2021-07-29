@@ -72,6 +72,8 @@
 #include "nrf_log_default_backends.h"
 #include "nrf_ble_scan.h"
 
+#include "main.h"
+
 #include "ble_rcs_c.h"
 #include "uart.h"
 
@@ -91,7 +93,7 @@
 #define SEC_PARAM_MIN_KEY_SIZE      7                                   /**< Minimum encryption key size in octets. */
 #define SEC_PARAM_MAX_KEY_SIZE      16                                  /**< Maximum encryption key size in octets. */
 
-#define SCAN_DURATION_WITELIST      3000                                /**< Duration of the scanning in units of 10 milliseconds. */
+#define SCAN_DURATION_WITELIST      0                                   /**< Duration of the scanning in units of 10 milliseconds. */
 #define RCS_SERVICE_UUID_TYPE   BLE_UUID_TYPE_VENDOR_BEGIN
 /**@brief RCS UUID. */
 static ble_uuid_t const m_rcs_uuid =
@@ -111,7 +113,8 @@ NRF_BLE_SCAN_DEF(m_scan);                                           /**< Scannin
 static uint16_t m_conn_handle;                                      /**< Current connection handle. */
 static bool     m_whitelist_disabled;                               /**< True if whitelist has been temporarily disabled. */
 static bool     m_memory_access_in_progress;                        /**< Flag to keep track of ongoing operations on persistent memory. */
-
+static bool     erasing_bonds = false;
+bool is_scanning = false;
 /**< Scan parameters requested for scanning and connection. */
 static ble_gap_scan_params_t const m_scan_param =
 {
@@ -124,7 +127,7 @@ static ble_gap_scan_params_t const m_scan_param =
     .window        = NRF_BLE_SCAN_SCAN_WINDOW,      // 50ms
 #endif // (NRF_SD_BLE_API_VERSION > 7)
     .filter_policy = BLE_GAP_SCAN_FP_WHITELIST,
-    .timeout       = SCAN_DURATION_WITELIST,        // 30s
+    .timeout       = SCAN_DURATION_WITELIST,        // infinite
     .scan_phys     = BLE_GAP_PHY_1MBPS,
 };
 
@@ -399,14 +402,22 @@ static void peer_manager_init(void)
 
 /** @brief Clear bonding information from persistent storage
  */
-static void delete_bonds(void)
+void delete_bonds(void)
 {
+    erasing_bonds = true;
     ret_code_t err_code;
-
+    if(m_ble_rcs_c.conn_handle != BLE_CONN_HANDLE_INVALID)
+    {
+        err_code = sd_ble_gap_disconnect(m_conn_handle,
+                                   BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+        APP_ERROR_CHECK(err_code);
+    }
     NRF_LOG_INFO("Erase bonds!");
 
     err_code = pm_peers_delete();
     APP_ERROR_CHECK(err_code);
+    
+    erasing_bonds = false;
 }
 
 
@@ -420,6 +431,7 @@ static void whitelist_disable(void)
         NRF_LOG_INFO("Whitelist temporarily disabled.");
         m_whitelist_disabled = true;
         nrf_ble_scan_stop();
+        is_scanning = false;
         scan_start();
     }
 }
@@ -527,6 +539,8 @@ static void on_whitelist_req(void)
  */
 static void scan_start(void)
 {
+    if(erasing_bonds == true || is_scanning == true)
+        return;
     ret_code_t err_code;
 
     if (nrf_fstorage_is_busy(NULL))
@@ -539,6 +553,8 @@ static void scan_start(void)
 
     err_code = nrf_ble_scan_start(&m_scan);
     APP_ERROR_CHECK(err_code);
+
+    is_scanning = true;
 }
 
 /**@brief Function for initializing the nrf log module.
@@ -705,34 +721,8 @@ static void scan_init(void)
  */
 static void idle_state_handle(void)
 {
-    //ret_code_t err_code;
-    
-    //err_code = nrf_ble_lesc_request_handler();
-    //APP_ERROR_CHECK(err_code);
-    // TODO enter_power_down()
     NRF_LOG_FLUSH();
     nrf_pwr_mgmt_run();
-}
-
-
-/**@brief Function for starting a scan, or instead trigger it from peer manager (after
- *        deleting bonds).
- *
- * @param[in] p_erase_bonds Pointer to a bool to determine if bonds will be deleted before scanning.
- */
-void scanning_start(bool * p_erase_bonds)
-{
-    // Start scanning for peripherals and initiate connection
-    // with devices that advertise GATT Service UUID.
-    if (*p_erase_bonds == true)
-    {
-        // Scan is started by the PM_EVT_PEERS_DELETE_SUCCEEDED event.
-        delete_bonds();
-    }
-    else
-    {
-        scan_start();
-    }
 }
 
 APP_TIMER_DEF(m_notify_timer);
@@ -780,13 +770,14 @@ static void ble_rcs_c_evt_handler(ble_rcs_c_t * p_ble_rcs_c, ble_rcs_c_evt_t con
             {
                 APP_ERROR_CHECK(err_code);
             }
-            err_code = app_timer_start(m_notify_timer, APP_TIMER_TICKS(1000), (void*)p_ble_rcs_c);
+            err_code = app_timer_start(m_notify_timer, APP_TIMER_TICKS(250), (void*)p_ble_rcs_c);
             APP_ERROR_CHECK(err_code);       
             
             NRF_LOG_INFO("Connected to device with Remote Control Service.");
             break;
 
         case BLE_RCS_C_EVT_RCS_COMMAND_EVT:
+            // TODO Send command to host control by UART.
             ble_rcs_command_notify_debug((ble_rcs_cmd_t *)p_ble_rcs_evt->p_command);
             break;
 
@@ -821,8 +812,6 @@ static void rcs_c_init(void)
 
 int main(void)
 {
-    bool erase_bonds = true;
-
     // Initialize.
     log_init();
     timer_init();
@@ -838,8 +827,8 @@ int main(void)
     uart_init();
     sd_power_dcdc_mode_set(NRF_POWER_DCDC_ENABLE);
     // Start execution.
-    NRF_LOG_INFO("Heart Rate collector example started.");
-    scanning_start(&erase_bonds);
+    NRF_LOG_INFO("BLE remote control collector example started.");
+    scan_start();
 
     // Enter main loop.
     for (;;)
