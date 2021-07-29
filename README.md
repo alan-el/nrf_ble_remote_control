@@ -19,3 +19,7 @@ Using nRF52 series SoC to develop a BLE remote control by a custom GATT service 
 1. 遥控器增加adv idle时进入 power down 模式，按键唤醒(会reset)
 2. Notify 命令特征值时加限定，防止连接未绑定的设备时notify引起SoftDevice错误
 3. 增加长按Mode键擦除 BLE Bonds 信息的功能
+
+2021-07-29 晚
+1. Client 也增加擦除 BLE Bonds 信息的函数，并且改进了Server 侧擦除BLE Bonds的函数，在连接状态也可以擦除了
+2. 按键唤醒会记录按键的事件类型(button release)，如果白名单中有peer，在连接到peer后会notify对应命令(延时未测)
