@@ -2,6 +2,7 @@
 #include "app_timer.h"
 #include "app_error.h"
 #include "ble_rcs.h"
+#include "main.h"
 
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
@@ -40,7 +41,7 @@ button_event_cfg_t m_btn_event_list[BUTTONS_NUMBER] =
     {
         BUTTON_EVENT_NOTHING,
         BUTTON_EVENT_NEXT_PARA,
-        BUTTON_EVENT_DEBUG      // TODO test
+        BUTTON_EVENT_NOTHING      
     },
     // button 2
     {
@@ -76,7 +77,7 @@ button_event_cfg_t m_btn_event_list[BUTTONS_NUMBER] =
     {
         BUTTON_EVENT_NOTHING,
         BUTTON_EVENT_MODE,
-        BUTTON_EVENT_NOTHING
+        BUTTON_EVENT_ERASE_BONDS
     }
 };
 
@@ -143,6 +144,10 @@ void button_command_process(button_event_t btn_evt)
             NRF_LOG_DEBUG("Mode command get.");
             ble_rcs_command_notification(BLE_RCS_CMD_MODE);
             break;   
+        case BUTTON_EVENT_ERASE_BONDS:
+            NRF_LOG_DEBUG("Erase bonds command get.");
+            delete_bonds();
+            break;
         case BUTTON_EVENT_DEBUG:
             NRF_LOG_DEBUG("Debug command get.");
             ble_rcs_command_notification(BLE_RCS_CMD_INVALID);
@@ -193,7 +198,7 @@ void button_evt_handler(uint8_t pin_no, uint8_t button_action)
         }
     }
 
-    if ((event != BUTTON_EVENT_NOTHING) && (button_command_process != NULL))
+    if (event != BUTTON_EVENT_NOTHING)
     {
         button_command_process(event);
     }
@@ -212,4 +217,10 @@ void button_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
-
+void prepare_button_wake_up_from_power_down_mode(void)
+{
+    for(int i = 0; i < BUTTONS_NUMBER; i++)
+    {
+        nrf_gpio_cfg_sense_set(m_btn_list[i], NRF_GPIO_PIN_SENSE_HIGH);
+    }
+}

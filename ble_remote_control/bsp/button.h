@@ -24,7 +24,7 @@
 { \
     .pin_no = _pin_no, \
     .active_state = APP_BUTTON_ACTIVE_HIGH, \
-    .pull_cfg = NRF_GPIO_PIN_NOPULL, \
+    .pull_cfg = NRF_GPIO_PIN_PULLDOWN, \
     .button_handler = button_evt_handler, \
 }
 
@@ -39,6 +39,8 @@ typedef enum
     BUTTON_EVENT_PLUS,
     BUTTON_EVENT_MODE,
 
+    BUTTON_EVENT_ERASE_BONDS,
+
     BUTTON_EVENT_DEBUG,
     
 }button_event_t;
@@ -52,6 +54,7 @@ typedef struct
 
 void button_evt_handler(uint8_t pin_no, uint8_t button_action);
 void button_init(void);
+void prepare_button_wake_up_from_power_down_mode(void);
 
 #endif
 

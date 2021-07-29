@@ -8,7 +8,7 @@
 #include "app_timer.h"
 
 #define BATTERY_VOLTAGE_DETECT_INTERVAL_MS  (1000)
-#define PARTIAL_VOLTAGE_RATIO               (2)
+#define PARTIAL_VOLTAGE_RATIO               (2 * 1.0366)
 APP_TIMER_DEF(m_bat_dtct_tmr);
 
 int16_t battery_voltage = 0;
