@@ -3,6 +3,7 @@
 #include "app_error.h"
 #include "ble_rcs.h"
 #include "main.h"
+#include "ble_gap.h"
 
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
@@ -10,8 +11,11 @@
 
 
 APP_TIMER_DEF(m_btn_long_push_tmr);
+APP_TIMER_DEF(m_start_up_cmd_tmr);
 
-const app_button_cfg_t m_buttons[BUTTONS_NUMBER] = 
+button_event_t start_up_evt = BUTTON_EVENT_NOTHING;
+
+static const app_button_cfg_t m_buttons[BUTTONS_NUMBER] = 
 {
     BUTTON_CFG(BUTTON1_PIN_NO),
     BUTTON_CFG(BUTTON2_PIN_NO),
@@ -23,7 +27,7 @@ const app_button_cfg_t m_buttons[BUTTONS_NUMBER] =
     BUTTON_CFG(BUTTON12_PIN_NO)
 };
 
-uint8_t m_btn_list[BUTTONS_NUMBER] = 
+static uint8_t m_btn_list[BUTTONS_NUMBER] = 
 {   
     BUTTON1_PIN_NO,
     BUTTON2_PIN_NO,
@@ -35,7 +39,7 @@ uint8_t m_btn_list[BUTTONS_NUMBER] =
     BUTTON12_PIN_NO
 };
 
-button_event_cfg_t m_btn_event_list[BUTTONS_NUMBER] = 
+static button_event_cfg_t m_btn_event_list[BUTTONS_NUMBER] = 
 {
     // button 1
     {
@@ -81,9 +85,9 @@ button_event_cfg_t m_btn_event_list[BUTTONS_NUMBER] =
     }
 };
 
-void button_evt_handler(uint8_t pin_no, uint8_t button_action);
+static void button_command_process(button_event_t btn_evt);
 
-uint32_t button_pin_to_idx(uint8_t pin_no)
+static uint32_t button_pin_to_idx(uint8_t pin_no)
 {
     uint32_t i;
     uint32_t ret = 0xFFFFFFFF;
@@ -98,21 +102,42 @@ uint32_t button_pin_to_idx(uint8_t pin_no)
     return ret;
 }
 
-void button_long_push_detect(void *p_context)
+static void button_long_push_detect(void *p_context)
 {
-    uint8_t pin_no  = *((uint8_t *)p_context);
+    uint8_t pin_no = *((uint8_t *)p_context);
 
     button_evt_handler(pin_no, BUTTON_ACTION_LONG_PUSH);
 }
 
-uint32_t button_long_push_timer_create(void)
+static uint32_t button_long_push_timer_create(void)
 {
     uint32_t ret_code;
     ret_code = app_timer_create(&m_btn_long_push_tmr, APP_TIMER_MODE_SINGLE_SHOT, button_long_push_detect);
     return ret_code;
 }
 
-void button_command_process(button_event_t btn_evt)
+static void start_up_command_notification(void *p_context)
+{
+    button_event_t start_cmd = *((button_event_t *)p_context);
+
+    button_command_process(start_cmd);
+    
+    start_up_evt = BUTTON_EVENT_NOTHING;
+}
+
+void start_up_command_notification_timer_start(button_event_t *p_evt)
+{
+    app_timer_start(m_start_up_cmd_tmr, APP_TIMER_TICKS(START_CMD_NTF_TIMEOUT_MS), (void*)p_evt);
+}
+
+static uint32_t start_up_command_notification_timer_create(void)
+{
+    uint32_t ret_code;
+    ret_code = app_timer_create(&m_start_up_cmd_tmr, APP_TIMER_MODE_SINGLE_SHOT, start_up_command_notification);
+    return ret_code;
+}
+
+static void button_command_process(button_event_t btn_evt)
 {
     switch(btn_evt)
     {
@@ -204,6 +229,21 @@ void button_evt_handler(uint8_t pin_no, uint8_t button_action)
     }
 }
 
+static void extract_cmd_startup_button_pressed(void)
+{
+    for(int i = 0; i < BUTTONS_NUMBER; i++)
+    {
+        bool pin_set = nrf_gpio_pin_read(m_btn_list[i]) ? true : false;
+        
+        if(pin_set == (BUTTON_ACTIVE_STATE ? true : false))
+        {
+            start_up_evt = m_btn_event_list[i].release_event;
+            return ;
+        }
+            
+    }
+}
+
 void button_init(void)
 {
     uint32_t err_code;
@@ -215,6 +255,11 @@ void button_init(void)
     
     err_code = button_long_push_timer_create();
     APP_ERROR_CHECK(err_code);
+
+    err_code = start_up_command_notification_timer_create();
+    APP_ERROR_CHECK(err_code);
+    
+    extract_cmd_startup_button_pressed();
 }
 
 void prepare_button_wake_up_from_power_down_mode(void)

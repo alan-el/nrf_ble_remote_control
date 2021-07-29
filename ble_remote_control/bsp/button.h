@@ -17,13 +17,14 @@
 #define BUTTON12_PIN_NO (10)
 
 #define BUTTON_LONG_PUSH_TIMEOUT_MS (2000)
+#define START_CMD_NTF_TIMEOUT_MS (500)
 #define BUTTON_ACTION_LONG_PUSH (2)
-
+#define BUTTON_ACTIVE_STATE     APP_BUTTON_ACTIVE_HIGH
 
 #define BUTTON_CFG(_pin_no) \
 { \
     .pin_no = _pin_no, \
-    .active_state = APP_BUTTON_ACTIVE_HIGH, \
+    .active_state = BUTTON_ACTIVE_STATE, \
     .pull_cfg = NRF_GPIO_PIN_PULLDOWN, \
     .button_handler = button_evt_handler, \
 }
@@ -52,6 +53,7 @@ typedef struct
     button_event_t long_push_event; /**< The event to fire on long button press. */
 } button_event_cfg_t;
 
+void start_up_command_notification_timer_start(button_event_t *p_evt);
 void button_evt_handler(uint8_t pin_no, uint8_t button_action);
 void button_init(void);
 void prepare_button_wake_up_from_power_down_mode(void);
