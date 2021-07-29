@@ -200,7 +200,7 @@ void ble_rcs_command_notification(ble_rcs_cmd_t cmd)
         cccd_data.offset = 0;
         cccd_data.p_value = (uint8_t*)&cccd_value;
         sd_ble_gatts_value_get(m_rcs.conn_handle, m_rcs.command_char_handles.cccd_handle, &cccd_data);
-        NRF_LOG_DEBUG("CCCD value: %d", cccd_value);
+        NRF_LOG_DEBUG("CCCD value: %d", cccd_value);
         
         if(cccd_value == 1 || cccd_value == 2)
         {
