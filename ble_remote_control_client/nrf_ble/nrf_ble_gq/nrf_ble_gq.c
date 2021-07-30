@@ -335,10 +335,10 @@ static void queues_purge(nrf_ble_gq_t const * const p_gatt_queue)
  * @retval  true   If request is accepted by Softdevice.
  * @retval  false  If Softdevice is busy and the request should be queued.
  */
+
 static bool request_process(nrf_ble_gq_req_t const * const p_req, uint16_t conn_handle)
 {
     ret_code_t err_code = NRF_SUCCESS;
-
     switch (p_req->type)
     {
         case NRF_BLE_GQ_REQ_GATTC_READ:

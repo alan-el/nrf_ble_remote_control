@@ -6,6 +6,10 @@
 *.ko
 *.obj
 *.elf
+*.dep
+*.__i
+*.htm
+*.sct
 
 # Linker output
 *.ilk
@@ -54,3 +58,4 @@ dkms.conf
 # Directory
 project/
 !project/*.uv*x
+si4proj/

@@ -482,7 +482,7 @@ void pm_handler_flash_clean(pm_evt_t const * p_pm_evt)
     }
 }
 
-
+extern bool g_secure_connection;
 void pm_handler_pm_evt_log(pm_evt_t const * p_pm_evt)
 {
     NRF_LOG_DEBUG("Event %s", m_event_str[p_pm_evt->evt_id]);
@@ -508,6 +508,7 @@ void pm_handler_pm_evt_log(pm_evt_t const * p_pm_evt)
                          m_roles_str[ble_conn_state_role(p_pm_evt->conn_handle)],
                          p_pm_evt->conn_handle,
                          m_sec_procedure_str[p_pm_evt->params.conn_sec_start.procedure]);
+            g_secure_connection = true;
             break;
 
         case PM_EVT_CONN_SEC_FAILED:

@@ -42,6 +42,7 @@
 #include "app_error.h"
 #include "nrf_log.h"
 extern ble_rcs_t m_rcs;
+extern bool g_secure_connection;
 // ALREADY_DONE_FOR_YOU: Declaration of a function that will take care of some housekeeping of ble connections related to our service and characteristic
 void ble_rc_service_on_ble_evt(ble_evt_t const * p_ble_evt, void * p_context)
 {
@@ -190,7 +191,7 @@ void ble_rcs_command_notification(ble_rcs_cmd_t cmd)
     
     
     // 检查当前是否有连接
-    if (m_rcs.conn_handle != BLE_CONN_HANDLE_INVALID )
+    if (m_rcs.conn_handle != BLE_CONN_HANDLE_INVALID && g_secure_connection == true)
     {
         // 检查当前连接的Client是否使能了命令特征值的Notification or indication
         uint16_t cccd_value;

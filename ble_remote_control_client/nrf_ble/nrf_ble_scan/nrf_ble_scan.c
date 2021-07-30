@@ -56,7 +56,7 @@
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
-
+extern bool is_scanning;
 /**@brief Function for establishing the connection with a device.
  *
  * @details Connection is established if @ref NRF_BLE_SCAN_EVT_FILTER_MATCH
@@ -88,7 +88,7 @@ static void nrf_ble_scan_connect_with_target(nrf_ble_scan_t           const * co
 
     // Stop scanning.
     nrf_ble_scan_stop();
-
+    is_scanning = false;    // zqn
     memset(&scan_evt, 0, sizeof(scan_evt));
 
     // Establish connection.
@@ -1210,7 +1210,7 @@ ret_code_t nrf_ble_scan_params_set(nrf_ble_scan_t              * const p_scan_ct
     VERIFY_PARAM_NOT_NULL(p_scan_ctx);
 
     nrf_ble_scan_stop();
-
+    is_scanning = false;    // zqn
     if (p_scan_param != NULL)
     {
         // Assign new scanning parameters.

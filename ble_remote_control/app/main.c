@@ -133,19 +133,13 @@
 #define SCHED_QUEUE_SIZE                    10                                         /**< Maximum number of events in the scheduler queue. */
 #endif
 
-#define MODIFIER_KEY_POS                    0                                          /**< Position of the modifier byte in the Input Report. */
-#define SCAN_CODE_POS                       2                                          /**< The start position of the key scan code in a HID Report. */
-#define SHIFT_KEY_CODE                      0x02                                       /**< Key code indicating the press of the Shift Key. */
-
-#define MAX_KEYS_IN_ONE_REPORT              (INPUT_REPORT_KEYS_MAX_LEN - SCAN_CODE_POS)/**< Maximum number of key presses that can be sent in one Input Report. */
-
 NRF_BLE_GATT_DEF(m_gatt);                                           /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr);                                             /**< Context for the Queued Write module.*/
 BLE_ADVERTISING_DEF(m_advertising);                                 /**< Advertising module instance. */
 
 extern button_event_t start_up_evt;
 ble_rcs_t m_rcs = {0};
-
+bool g_secure_connection = false;
 static uint16_t          m_conn_handle  = BLE_CONN_HANDLE_INVALID;  /**< Handle of the current connection. */
 static pm_peer_id_t      m_peer_id;                                 /**< Device reference handle to the current bonded central. */
 
@@ -569,7 +563,7 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
 
         case BLE_GAP_EVT_DISCONNECTED:
             NRF_LOG_INFO("Disconnected");
-            
+            g_secure_connection = false;
             m_conn_handle = BLE_CONN_HANDLE_INVALID;
             if(delete_bonds_after_disconnect == true)
             {

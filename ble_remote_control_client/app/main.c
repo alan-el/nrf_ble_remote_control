@@ -826,10 +826,12 @@ int main(void)
     
     uart_init();
     sd_power_dcdc_mode_set(NRF_POWER_DCDC_ENABLE);
+    
+    delete_bonds();
     // Start execution.
     NRF_LOG_INFO("BLE remote control collector example started.");
     scan_start();
-
+    
     // Enter main loop.
     for (;;)
     {
