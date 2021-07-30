@@ -3720,7 +3720,7 @@
           <targetInfo name="nrf52810_xxaa"/>
         </targetInfos>
       </file>
-      <file attr="config" category="header" name="Device\Source\startup_config.h" version="8.38.0">
+      <file attr="config" category="header" name="Device\Source\startup_config.h">
         <instance index="0">RTE\Device\nRF52810_xxAA\startup_config.h</instance>
         <component Cclass="Device" Cgroup="StartupConfig" Cvendor="NordicSemiconductor" Cversion="8.38.0" condition="Startup"/>
         <package license="License/license.txt" name="nRF_DeviceFamilyPack" schemaVersion="1.3" url="http://developer.nordicsemi.com/nRF5_SDK/pieces/nRF_DeviceFamilyPack/" vendor="NordicSemiconductor" version="8.38.0"/>
@@ -3728,7 +3728,7 @@
           <targetInfo name="flash_s112_nrf52_7.2.0_softdevice"/>
         </targetInfos>
       </file>
-      <file attr="config" category="source" name="Device\Source\system_nrf52.c" version="8.38.0">
+      <file attr="config" category="source" name="Device\Source\system_nrf52.c">
         <instance index="0">RTE\Device\nRF52810_xxAA\system_nrf52.c</instance>
         <component Cclass="Device" Cgroup="Startup" Cvendor="NordicSemiconductor" Cversion="8.38.0" condition="nRF52810 Device and CMSIS"/>
         <package license="License/license.txt" name="nRF_DeviceFamilyPack" schemaVersion="1.3" url="http://developer.nordicsemi.com/nRF5_SDK/pieces/nRF_DeviceFamilyPack/" vendor="NordicSemiconductor" version="8.38.0"/>
@@ -3736,7 +3736,7 @@
           <targetInfo excluded="1" name="flash_s112_nrf52_7.2.0_softdevice"/>
         </targetInfos>
       </file>
-      <file attr="config" category="source" name="Device\Source\system_nrf52810.c" version="8.35.0">
+      <file attr="config" category="source" name="Device\Source\system_nrf52810.c">
         <instance index="0">RTE\Device\nRF52810_xxAA\system_nrf52810.c</instance>
         <component Cclass="Device" Cgroup="Startup" Cvendor="NordicSemiconductor" Cversion="8.35.0" condition="nRF52810 Device and CMSIS"/>
         <package license="License/license.txt" name="nRF_DeviceFamilyPack" schemaVersion="1.3" url="http://developer.nordicsemi.com/nRF5_SDK/pieces/nRF_DeviceFamilyPack/" vendor="NordicSemiconductor" version="8.35.0"/>
