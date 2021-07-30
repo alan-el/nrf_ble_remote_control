@@ -23,3 +23,6 @@ Using nRF52 series SoC to develop a BLE remote control by a custom GATT service 
 2021-07-29 晚
 1. Client 也增加擦除 BLE Bonds 信息的函数，并且改进了Server 侧擦除BLE Bonds的函数，在连接状态也可以擦除了
 2. 按键唤醒会记录按键的事件类型(button release)，如果白名单中有peer，在连接到peer后会notify对应命令(延时未测)
+
+2021-07-30 晚
+1. 修复连接未绑定情况下发送命令是 Server SoftDevice ERROR 的问题
