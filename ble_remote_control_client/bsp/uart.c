@@ -2,7 +2,12 @@
 #include "uart.h"
 #include "nrf_uart.h"
 #include "nrf_uarte.h"
+#include "uart_nrf52_rv1126.h"
 #include <string.h>
+
+extern uint8_t m_rx_buffer[64];
+extern uint32_t rx_idx;
+
 void uart_error_handle(app_uart_evt_t * p_event)
 {
     switch(p_event->evt_type)
@@ -15,6 +20,7 @@ void uart_error_handle(app_uart_evt_t * p_event)
             APP_ERROR_HANDLER(p_event->data.error_code);
             break;
         case APP_UART_DATA_READY:
+            uart_nrf52_rv1126_get_cmd(m_rx_buffer, &rx_idx);
             break;
         case APP_UART_TX_EMPTY:
             break;

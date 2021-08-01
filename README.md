@@ -26,3 +26,6 @@ Using nRF52 series SoC to develop a BLE remote control by a custom GATT service 
 
 2021-07-30 晚
 1. 修复连接未绑定情况下发送命令是 Server SoftDevice ERROR 的问题
+
+2021-08-01 午
+1. 增加nRF52832与RV1126 UART 通信协议

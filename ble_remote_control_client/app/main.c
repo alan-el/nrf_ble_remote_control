@@ -831,7 +831,6 @@ int main(void)
     // Start execution.
     NRF_LOG_INFO("BLE remote control collector example started.");
     scan_start();
-    
     // Enter main loop.
     for (;;)
     {
