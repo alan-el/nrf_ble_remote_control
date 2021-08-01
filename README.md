@@ -29,3 +29,7 @@ Using nRF52 series SoC to develop a BLE remote control by a custom GATT service 
 
 2021-08-01 午
 1. 增加nRF52832与RV1126 UART 通信协议
+
+2021-08-01 晚
+1. 增加串口协议word文档
+2. 修复Client在第一次扫描时，不使用白名单(使用UUID Filter)的情况下，在配对成功后又断开连接，再次扫描时还是不使用白名单的问题
