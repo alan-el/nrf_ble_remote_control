@@ -27,6 +27,8 @@ typedef enum
     N2R_CMD_TYPE_MINUS,         // "-"
     N2R_CMD_TYPE_PLUS,          // "+"
     N2R_CMD_TYPE_MODE,          // 模式
+    N2R_CMD_TYPE_BOND_SUCCESS,      // BLE配对成功
+    N2R_CMD_TYPE_DEL_BONDS_SUCCESS, // 擦除BLE配对信息成功
 
     /* rv1126 to nRF52832 command type */
     R2N_CMD_TYPE_DELETE_BONDS = 0x80, // 擦除广角板蓝牙SoC的BLE bonds信息

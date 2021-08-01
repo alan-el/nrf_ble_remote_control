@@ -507,7 +507,7 @@ static void whitelist_load()
 static void on_whitelist_req(void)
 {
     ret_code_t err_code;
-
+    NRF_LOG_DEBUG("on whitelist req.");
     // Whitelist buffers.
     ble_gap_addr_t whitelist_addrs[8];
     ble_gap_irk_t  whitelist_irks[8];
@@ -525,12 +525,14 @@ static void on_whitelist_req(void)
     err_code = pm_whitelist_get(whitelist_addrs, &addr_cnt,
                                 whitelist_irks,  &irk_cnt);
 
+    
     if (((addr_cnt == 0) && (irk_cnt == 0)) ||
         (m_whitelist_disabled))
     {
         // Don't use whitelist.
         err_code = nrf_ble_scan_params_set(&m_scan, NULL);
         APP_ERROR_CHECK(err_code);
+        NRF_LOG_DEBUG("Don't use whitelist scan.");
     }
 }
 
@@ -548,7 +550,7 @@ static void scan_start(void)
         m_memory_access_in_progress = true;
         return;
     }
-
+    m_scan.scan_params = m_scan_param;
     NRF_LOG_INFO("Starting scan.");
 
     err_code = nrf_ble_scan_start(&m_scan);
@@ -822,12 +824,12 @@ int main(void)
     db_discovery_init();
     rcs_c_init();
     scan_init();
+    delete_bonds();
     command_char_notify_timer_create();
     
     uart_init();
     sd_power_dcdc_mode_set(NRF_POWER_DCDC_ENABLE);
     
-    delete_bonds();
     // Start execution.
     NRF_LOG_INFO("BLE remote control collector example started.");
     scan_start();
