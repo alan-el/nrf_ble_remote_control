@@ -38,7 +38,8 @@ typedef enum
 typedef struct 
 {
     uint32_t start_code;
-    uint16_t cmd;
+    uint8_t cmd;
+    uint8_t seq_num;
     uint16_t crc;
 }nrf_rv1126_uart_t;
 

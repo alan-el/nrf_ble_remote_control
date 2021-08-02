@@ -66,19 +66,21 @@ bool crc_check_do(uint8_t * data, uint32_t length, uint16_t right_crc_value)
         return true;
 }
 
-
+uint8_t n2r_cmd_seq = 0;
 uint32_t uart_nrf52_rv1126_send_cmd(uint8_t *p_tx_buf, nrf_rv1126_cmd_t cmd_type)
 {
     uint32_t ret_code;
     nrf_rv1126_uart_handle p_nru = (nrf_rv1126_uart_handle)p_tx_buf;
     
     p_nru->start_code = NRU_START_CODE;
-    p_nru->cmd = (uint16_t)cmd_type;
-
+    p_nru->cmd = (uint8_t)cmd_type;
+    p_nru->seq_num = n2r_cmd_seq++;
     p_nru->crc = get_crc_value((uint8_t *)p_nru, NRC_LEN - CRC_LEN);
 
-    ret_code = uart_send(p_tx_buf, sizeof(nrf_rv1126_uart_t));
-
+    for(int i = 0; i < 3; i++)
+    {
+        ret_code = uart_send(p_tx_buf, sizeof(nrf_rv1126_uart_t));
+    }
     return ret_code;
 }
 
@@ -88,6 +90,7 @@ void reset_rx_buffer(void)
     rx_idx = 0;
 }
 
+uint8_t r2n_cmd_seq = 0xFF;
 uint32_t uart_nrf52_rv1126_get_cmd(uint8_t *p_rx_buf, uint32_t *p_idx)
 {
     uint8_t cr = 0;
@@ -118,9 +121,11 @@ uint32_t uart_nrf52_rv1126_get_cmd(uint8_t *p_rx_buf, uint32_t *p_idx)
         if((*p_idx) == NRC_LEN)   
         {
             nrf_rv1126_uart_handle p_rx_cmd = (nrf_rv1126_uart_handle)p_rx_buf;
-
-            if (crc_check_do(p_rx_buf, NRC_LEN - CRC_LEN, p_rx_cmd->crc) == true)
+            bool crc_ok = crc_check_do(p_rx_buf, NRC_LEN - CRC_LEN, p_rx_cmd->crc);
+            if (crc_ok == true && r2n_cmd_seq != p_rx_cmd->seq_num)
             {
+                r2n_cmd_seq = p_rx_cmd->seq_num;
+                
                 switch(p_rx_cmd->cmd)
                 {
                     case R2N_CMD_TYPE_DELETE_BONDS:

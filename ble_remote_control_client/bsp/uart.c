@@ -41,9 +41,9 @@ void uart_init(void)
       UART_HWFC,
       false,
 #if defined (UART_PRESENT)
-      NRF_UART_BAUDRATE_115200
+      NRF_UART_BAUDRATE_9600
 #else
-      NRF_UARTE_BAUDRATE_115200
+      NRF_UARTE_BAUDRATE_9600
 #endif
       };
 

@@ -33,3 +33,6 @@ Using nRF52 series SoC to develop a BLE remote control by a custom GATT service 
 2021-08-01 晚
 1. 增加串口协议word文档
 2. 修复Client在第一次扫描时，不使用白名单(使用UUID Filter)的情况下，在配对成功后又断开连接，再次扫描时还是不使用白名单的问题
+
+2021-08-02
+1. 修改UART 通信协议：增加一个字段seq_number；每次发送命令发3遍( seq_number相同 )，接收仍是收到一条正确的命令就执行( 相同seq_number的只执行一次 )
