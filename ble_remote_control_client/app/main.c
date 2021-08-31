@@ -746,7 +746,7 @@ uint32_t command_char_notify_timer_create(void)
 }
 
 
-/**@brief Callback handling Nordic UART Service (NUS) client events.
+/**@brief Callback handling Remote Control Service (RCS) client events.
  *
  * @details This function is called to notify the application of RCS client events.
  *

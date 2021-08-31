@@ -297,7 +297,7 @@ void ble_rcs_command_notify_debug(ble_rcs_cmd_t *p_cmd)
         case BLE_RCS_CMD_NEXT_PARA:
             NRF_LOG_DEBUG("Receive next paragraph command.");
             // TODO test
-            delete_bonds();
+            //delete_bonds();
             break;
         case BLE_RCS_CMD_PHOTO:
             NRF_LOG_DEBUG("Receive photograph command.");

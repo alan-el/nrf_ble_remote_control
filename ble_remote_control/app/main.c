@@ -302,8 +302,6 @@ static void timers_init(void)
 
     err_code = app_timer_init();
     APP_ERROR_CHECK(err_code);
-
-    APP_ERROR_CHECK(err_code);
 }
 
 
