@@ -36,3 +36,6 @@ Using nRF52 series SoC to develop a BLE remote control by a custom GATT service 
 
 2021-08-02
 1. 修改UART 通信协议：增加一个字段seq_number；每次发送命令发3遍( seq_number相同 )，接收仍是收到一条正确的命令就执行( 相同seq_number的只执行一次 )
+
+2021-09-02
+1. Client工程UART模块不使用DMA以节省功耗
