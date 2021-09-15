@@ -751,7 +751,7 @@ uint32_t command_char_notify_timer_create(void)
  * @details This function is called to notify the application of RCS client events.
  *
  * @param[in]   p_ble_rcs_c   RCS client handle. This identifies the RCS client.
- * @param[in]   p_ble_rcs_evt Pointer to the NUS client event.
+ * @param[in]   p_ble_rcs_evt Pointer to the RCS client event.
  */
 
 /**@snippet [Handling events from the ble_rcs_c module] */
